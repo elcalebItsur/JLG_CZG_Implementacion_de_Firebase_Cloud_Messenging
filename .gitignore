@@ -19,3 +19,7 @@ google-services.json
 app/google-services.json
 *.json
 !gradle/libs.versions.toml
+
+# Server
+server/node_modules
+server/package-lock.json

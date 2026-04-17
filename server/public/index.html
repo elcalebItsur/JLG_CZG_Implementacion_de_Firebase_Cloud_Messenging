@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCM Notifications Server</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            ring: 2px solid var(--primary);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        #status {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.875rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: none;
+        }
+
+        .success {
+            background-color: #dcfce7;
+            color: #166534;
+            display: block !important;
+        }
+
+        .error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            display: block !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Send Push Notification</h1>
+        <div class="form-group">
+            <label for="token">Device Token (from App)</label>
+            <textarea id="token" rows="3" placeholder="Paste FCM Token here..."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="title">Notification Title</label>
+            <input type="text" id="title" placeholder="e.g., Hello!">
+        </div>
+        <div class="form-group">
+            <label for="body">Notification Message</label>
+            <textarea id="body" rows="3" placeholder="e.g., This is a test message from Node.js"></textarea>
+        </div>
+        <button onclick="sendNotification()">Send Notification</button>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        async function sendNotification() {
+            const token = document.getElementById('token').value;
+            const title = document.getElementById('title').value;
+            const body = document.getElementById('body').value;
+            const statusDiv = document.getElementById('status');
+
+            if (!token || !title || !body) {
+                statusDiv.innerText = 'Please fill all fields';
+                statusDiv.className = 'error';
+                return;
+            }
+
+            statusDiv.innerText = 'Sending...';
+            statusDiv.className = '';
+            statusDiv.style.display = 'block';
+
+            try {
+                const response = await fetch('/send-notification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, title, body })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    statusDiv.innerText = 'Success! Message ID: ' + result.response;
+                    statusDiv.className = 'success';
+                } else {
+                    statusDiv.innerText = 'Error: ' + result.error;
+                    statusDiv.className = 'error';
+                }
+            } catch (err) {
+                statusDiv.innerText = 'Error: ' + err.message;
+                statusDiv.className = 'error';
+            }
+        }
+    </script>
+</body>
+</html>

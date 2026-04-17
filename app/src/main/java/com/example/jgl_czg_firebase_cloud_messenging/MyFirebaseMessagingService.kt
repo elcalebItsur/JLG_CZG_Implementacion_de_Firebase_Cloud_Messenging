@@ -50,7 +50,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             PendingIntent.FLAG_IMMUTABLE
         )
 
-        val channelId = "fcm_default_channel"
+        val channelId = "fcm_notifications_channel"
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher)
@@ -58,6 +58,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setContentText(messageBody)
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -65,13 +66,15 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
-                "Channel human readable title",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
+                "FCM Notifications",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Standard notifications for push messages"
+            }
             notificationManager.createNotificationChannel(channel)
         }
 
-        notificationManager.notify(0, notificationBuilder.build())
+        notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
     }
 
     companion object {

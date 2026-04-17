@@ -56,11 +56,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun askNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
                 PackageManager.PERMISSION_GRANTED
             ) {
-                // Permission already granted
-            } else {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
@@ -69,7 +67,6 @@ class MainActivity : AppCompatActivity() {
     private fun getFCMToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
-                Log.w("MainActivity", "Fetching FCM registration token failed", task.exception)
                 textViewToken.text = "Failed to get token"
                 return@addOnCompleteListener
             }
