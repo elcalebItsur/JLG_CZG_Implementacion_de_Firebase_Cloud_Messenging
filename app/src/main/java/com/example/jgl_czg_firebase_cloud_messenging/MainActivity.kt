@@ -1,13 +1,12 @@
 package com.example.jgl_czg_firebase_cloud_messenging
 
 import android.Manifest
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
+import android.content.*
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -20,15 +19,25 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var textViewToken: TextView
     private lateinit var textViewLastMessage: TextView
+    private lateinit var textViewLastMessageContent: TextView
     private lateinit var buttonCopyToken: Button
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            Toast.makeText(this, "Notifications permission granted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.identity), Toast.LENGTH_SHORT).show()
         } else {
-            Toast.makeText(this, "Notifications permission denied. You won't see notifications in foreground.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Permiso de notificaciones denegado.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private val messageReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val message = intent?.getStringExtra("message")
+            textViewLastMessage.text = getString(R.string.new_message_alert)
+            textViewLastMessageContent.text = message
+            textViewLastMessageContent.visibility = View.VISIBLE
         }
     }
 
@@ -38,20 +47,31 @@ class MainActivity : AppCompatActivity() {
 
         textViewToken = findViewById(R.id.textViewToken)
         textViewLastMessage = findViewById(R.id.textViewLastMessage)
+        textViewLastMessageContent = findViewById(R.id.textViewLastMessageContent)
         buttonCopyToken = findViewById(R.id.buttonCopyToken)
 
         buttonCopyToken.setOnClickListener {
             val token = textViewToken.text.toString()
-            if (token != "Fetching token..." && token.isNotEmpty()) {
+            if (token != getString(R.string.fetching_token) && token.isNotEmpty()) {
                 val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clip = ClipData.newPlainText("FCM Token", token)
                 clipboard.setPrimaryClip(clip)
-                Toast.makeText(this, "Token copied to clipboard", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.token_copied), Toast.LENGTH_SHORT).show()
             }
         }
 
         askNotificationPermission()
         getFCMToken()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        registerReceiver(messageReceiver, IntentFilter("com.example.jgl_czg_fcm.UPDATE_UI"), RECEIVER_EXPORTED)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unregisterReceiver(messageReceiver)
     }
 
     private fun askNotificationPermission() {
@@ -67,7 +87,7 @@ class MainActivity : AppCompatActivity() {
     private fun getFCMToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
-                textViewToken.text = "Failed to get token"
+                textViewToken.text = "Error al obtener token"
                 return@addOnCompleteListener
             }
 

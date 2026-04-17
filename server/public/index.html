@@ -1,130 +1,221 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FCM Notifications Server</title>
+    <title>Control Premium FCM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-muted: #64748b;
+            --primary-glow: rgba(99, 102, 241, 0.5);
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
 
-        .card {
-            background: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        /* Abstract shapes for background */
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: pulse 10s infinite alternate;
+        }
+        .circle-1 {
+            width: 400px;
+            height: 400px;
+            background: rgba(99, 102, 241, 0.15);
+            top: -100px;
+            right: -100px;
+        }
+        .circle-2 {
+            width: 300px;
+            height: 300px;
+            background: rgba(139, 92, 246, 0.15);
+            bottom: -50px;
+            left: -50px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .container {
             width: 100%;
-            max-width: 500px;
+            max-width: 480px;
+            padding: 20px;
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         h1 {
-            margin-top: 0;
-            font-size: 1.5rem;
+            margin: 0 0 8px 0;
+            font-size: 2rem;
+            font-weight: 700;
             text-align: center;
-            color: var(--primary);
-            margin-bottom: 2rem;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 32px;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            font-size: 0.875rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         input, textarea {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 14px;
+            color: var(--text-main);
             font-size: 1rem;
+            font-family: inherit;
             box-sizing: border-box;
-            transition: border-color 0.2s;
+            transition: all 0.3s ease;
         }
 
         input:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
-            ring: 2px solid var(--primary);
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 0 4px var(--primary-glow);
         }
 
         button {
             width: 100%;
-            padding: 0.75rem;
-            background-color: var(--primary);
+            padding: 16px;
+            background: var(--primary);
             color: white;
             border: none;
-            border-radius: 0.5rem;
-            font-weight: 600;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: background-color 0.2s;
-            margin-top: 1rem;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+            box-shadow: 0 10px 15px -3px var(--primary-glow);
         }
 
         button:hover {
-            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px var(--primary-glow);
+            filter: brightness(1.1);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         #status {
-            margin-top: 1.5rem;
+            margin-top: 24px;
             text-align: center;
-            font-size: 0.875rem;
-            padding: 1rem;
-            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            padding: 14px;
+            border-radius: 12px;
             display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .success {
-            background-color: #dcfce7;
-            color: #166534;
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.2);
             display: block !important;
         }
 
         .error {
-            background-color: #fee2e2;
-            color: #991b1b;
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
             display: block !important;
+        }
+
+        ::placeholder {
+            color: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>Send Push Notification</h1>
-        <div class="form-group">
-            <label for="token">Device Token (from App)</label>
-            <textarea id="token" rows="3" placeholder="Paste FCM Token here..."></textarea>
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+
+    <div class="container">
+        <div class="glass-card">
+            <h1>Panel Maestro FCM</h1>
+            <p class="subtitle">Centro de Control de Mensajería Cloud</p>
+            
+            <div class="form-group">
+                <label for="token">Token del Dispositivo Objetivo</label>
+                <textarea id="token" rows="3" placeholder="Pega el token de registro aquí..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="title">Título de Notificación</label>
+                <input type="text" id="title" placeholder="¿Cuál es el asunto?">
+            </div>
+            
+            <div class="form-group">
+                <label for="body">Mensaje de Contenido</label>
+                <textarea id="body" rows="3" placeholder="Escribe tu mensaje..."></textarea>
+            </div>
+            
+            <button id="sendBtn" onclick="sendNotification()">Transmitir Mensaje</button>
+            <div id="status"></div>
         </div>
-        <div class="form-group">
-            <label for="title">Notification Title</label>
-            <input type="text" id="title" placeholder="e.g., Hello!">
-        </div>
-        <div class="form-group">
-            <label for="body">Notification Message</label>
-            <textarea id="body" rows="3" placeholder="e.g., This is a test message from Node.js"></textarea>
-        </div>
-        <button onclick="sendNotification()">Send Notification</button>
-        <div id="status"></div>
     </div>
 
     <script>
@@ -133,16 +224,18 @@
             const title = document.getElementById('title').value;
             const body = document.getElementById('body').value;
             const statusDiv = document.getElementById('status');
+            const btn = document.getElementById('sendBtn');
 
             if (!token || !title || !body) {
-                statusDiv.innerText = 'Please fill all fields';
+                statusDiv.innerText = 'Todos los campos son obligatorios para la transmisión.';
                 statusDiv.className = 'error';
+                statusDiv.style.display = 'block';
                 return;
             }
 
-            statusDiv.innerText = 'Sending...';
-            statusDiv.className = '';
-            statusDiv.style.display = 'block';
+            btn.disabled = true;
+            btn.innerText = 'Transmitiendo...';
+            statusDiv.style.display = 'none';
 
             try {
                 const response = await fetch('/send-notification', {
@@ -153,15 +246,19 @@
 
                 const result = await response.json();
                 if (result.success) {
-                    statusDiv.innerText = 'Success! Message ID: ' + result.response;
+                    statusDiv.innerText = 'Transmisión Exitosa';
                     statusDiv.className = 'success';
                 } else {
-                    statusDiv.innerText = 'Error: ' + result.error;
+                    statusDiv.innerText = 'Error de Relevo: ' + result.error;
                     statusDiv.className = 'error';
                 }
             } catch (err) {
-                statusDiv.innerText = 'Error: ' + err.message;
+                statusDiv.innerText = 'Falla de Red: ' + err.message;
                 statusDiv.className = 'error';
+            } finally {
+                statusDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.innerText = 'Transmitir Mensaje';
             }
         }
     </script>

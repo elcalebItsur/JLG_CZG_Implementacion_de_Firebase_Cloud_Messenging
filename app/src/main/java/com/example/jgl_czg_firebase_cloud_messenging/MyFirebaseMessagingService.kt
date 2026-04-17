@@ -15,31 +15,32 @@ import com.google.firebase.messaging.RemoteMessage
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        Log.d(TAG, "From: ${remoteMessage.from}")
+        Log.d(TAG, "Desde: ${remoteMessage.from}")
 
         // Check if message contains a notification payload.
         remoteMessage.notification?.let {
-            Log.d(TAG, "Message Notification Body: ${it.body}")
-            sendNotification(it.title ?: "Notification", it.body ?: "")
+            Log.d(TAG, "Cuerpo de la notificación: ${it.body}")
+            sendNotification(it.title ?: "Notificación", it.body ?: "")
+            
+            // Send broadcast to update UI if app is open
+            val intent = Intent("com.example.jgl_czg_fcm.UPDATE_UI")
+            intent.putExtra("message", it.body)
+            sendBroadcast(intent)
         }
 
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
-            Log.d(TAG, "Message data payload: ${remoteMessage.data}")
-            // You can handle data here and update UI if needed.
+            Log.d(TAG, "Carga de datos: ${remoteMessage.data}")
         }
     }
 
     override fun onNewToken(token: String) {
-        Log.d(TAG, "Refreshed token: $token")
-        // If you want to send messages to this application instance or
-        // manage this apps subscriptions on the server side, send the
-        // FCM registration token to your app server.
+        Log.d(TAG, "Token refrescado: $token")
         sendRegistrationToServer(token)
     }
 
     private fun sendRegistrationToServer(token: String?) {
-        // Implement this method to send token to your app server.
+        // Implement method if needed
     }
 
     private fun sendNotification(title: String, messageBody: String) {
@@ -66,10 +67,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
-                "FCM Notifications",
+                "Notificaciones FCM",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Standard notifications for push messages"
+                description = "Notificaciones estándar para mensajes push"
             }
             notificationManager.createNotificationChannel(channel)
         }

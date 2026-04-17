@@ -1,3 +1,12 @@
 <resources>
-    <string name="app_name">JGL_CZG_Firebase-Cloud-Messenging</string>
+    <string name="app_name">Mensajería Cloud FCM</string>
+    <string name="identity">Identidad del Dispositivo</string>
+    <string name="token_label">Token de Registro FCM</string>
+    <string name="copy_token">Copiar Token</string>
+    <string name="real_time_updates">Actualizaciones en Tiempo Real</string>
+    <string name="last_message_received">Último Mensaje Recibido</string>
+    <string name="waiting_messages">Esperando mensajes...</string>
+    <string name="new_message_alert">¡Nuevo Mensaje Recibido!</string>
+    <string name="token_copied">Token copiado al portapapeles</string>
+    <string name="fetching_token">Obteniendo token...</string>
 </resources>
